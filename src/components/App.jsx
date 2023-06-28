@@ -6,6 +6,8 @@ import Button from './Button/Button';
 import ImageGallery from './ImageGallery/ImageGallery';
 import Loader from './Loader/Loader';
 import Modal from 'components/Modal/Modal';
+import Notiflix from 'notiflix';
+
 
 import { AppStyled } from './App.styled';
 
@@ -23,6 +25,7 @@ class App extends Component {
   componentDidUpdate = (prevProps, prevState) => {
     const { searchValue, pageNumber } = this.state;
 
+
     if (
       prevState.searchValue !== searchValue ||
       prevState.pageNumber !== pageNumber
@@ -37,12 +40,13 @@ class App extends Component {
           }))
         )
         .catch(() => {
-          alert('Ooops!!!');
+          Notiflix.Notify.failure('Sorry, We have a problem');
         })
         .finally(() => {
           this.setState({ loading: false });
         });
     }
+   
   };
 
   onClickButtonMore = () => {

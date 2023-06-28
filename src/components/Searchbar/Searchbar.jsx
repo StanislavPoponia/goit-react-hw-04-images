@@ -1,6 +1,7 @@
 import { Component } from 'react';
-
 import PropTypes from 'prop-types';
+import Notiflix from 'notiflix';
+
 
 import { ReactComponent as MyIcon } from '../search.svg';
 import {
@@ -11,6 +12,7 @@ import {
   SearchInput,
 } from './Searchbar.styled';
 
+
 class Searchbar extends Component {
   state = {
     searchValue: '',
@@ -20,14 +22,18 @@ class Searchbar extends Component {
     this.setState({ searchValue: e.target.value });
   };
 
+
   onSubmit = event => {
     event.preventDefault();
     if (this.state.searchValue.trim() === '') {
-      alert('HEY!?! WHAT ARE YOU DOING???');
+      Notiflix.Notify.info('Enter your search details');
       return;
     }
     this.props.onSubmitHandler(this.state.searchValue);
     this.setState({ searchValue: '' });
+
+   
+   
   };
 
   render() {
