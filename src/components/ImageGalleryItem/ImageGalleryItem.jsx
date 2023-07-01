@@ -1,25 +1,20 @@
-import { Component } from 'react';
 import { ImageGalleryItemStyled, Image } from './ImageGalleryItem.styled';
-
 import PropTypes from 'prop-types';
 
-class ImageGalleryItem extends Component {
-  render() {
-    const { smallFormat, onClick, largeFormat } = this.props;
+const ImageGalleryItem = ({ smallFormat, onClick, largeFormat }) => {
+  return (
+    <ImageGalleryItemStyled>
+      <Image
+        src={smallFormat}
+        alt=""
+        onClick={() => {
+          onClick(largeFormat);
+        }}
+      />
+    </ImageGalleryItemStyled>
+  );
+};
 
-    return (
-      <ImageGalleryItemStyled>
-        <Image
-          src={smallFormat}
-          alt=""
-          onClick={() => {
-            onClick(largeFormat);
-          }}
-        />
-      </ImageGalleryItemStyled>
-    );
-  }
-}
 export default ImageGalleryItem;
 
 ImageGalleryItem.propsTypes = {

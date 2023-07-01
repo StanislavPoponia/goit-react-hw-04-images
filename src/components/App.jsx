@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useEffect, useState } from 'react';
 
 import fetchPixabay from './Pixabay/fetchPixabay';
 import Searchbar from './Searchbar/Searchbar';
@@ -12,80 +12,63 @@ import Notiflix from 'notiflix';
 import { AppStyled } from './App.styled';
 
 
-class App extends Component {
-  state = {
-    searchValue: '',
-    pageNumber: 1,
-    imgArray: [],
-    loadMore: false,
-    loading: false,
-    largeFormat: '',
-  };
+const App = () => {
+  const [searchValue, setSearchValue] = useState('');
+  const [pageNumber, setPageNumber] = useState(1);
+  const [imgArray, setImgArray] = useState([]);
+  const [largeFormat, setLargeFormat] = useState('');
+  const [loadMore, setLoadMore] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [isShow, setIsShow] = useState(false);
 
-  componentDidUpdate = (prevProps, prevState) => {
-    const { searchValue, pageNumber } = this.state;
-
-
-    if (
-      prevState.searchValue !== searchValue ||
-      prevState.pageNumber !== pageNumber
-    ) {
-      this.setState({ loading: true });
-
+  useEffect(() => {
+    if (searchValue) {
+      setLoading(true);
       fetchPixabay(searchValue, pageNumber)
-        .then(response =>
-          this.setState(state => ({
-            imgArray: [...state.imgArray, ...response.data.hits],
-            loadMore: pageNumber < Math.ceil(response.data.totalHits / 12),
-          }))
-        )
+        .then(response => {
+          return (
+            setImgArray(imgArray => [...imgArray, ...response.data.hits]),
+            setLoadMore(pageNumber < Math.ceil(response.data.totalHits / 12))
+          );
+        })
         .catch(() => {
           Notiflix.Notify.failure('Sorry, We have a problem');
         })
         .finally(() => {
-          this.setState({ loading: false });
+          setLoading(false);
         });
     }
-   
+  }, [searchValue, pageNumber]);
+
+  const onClickButtonMore = () => {
+    setPageNumber(pageNumber => pageNumber + 1);
   };
 
-  onClickButtonMore = () => {
-    this.setState(prevState => ({
-      pageNumber: prevState.pageNumber + 1,
-    }));
+  const onSubmitHandler = searchValue => {
+    setSearchValue(searchValue);
+    setPageNumber(1);
+    setImgArray([]);
+    setLoadMore(false);
   };
 
-  onSubmitHandler = searchValue => {
-    this.setState({
-      searchValue,
-      pageNumber: 1,
-      imgArray: [],
-      loadMore: false,
-    });
+  const onOpenModal = largeFormat => {
+    setIsShow(true);
+    setLargeFormat(largeFormat);
   };
 
-  onOpenModal = largeFormat => {
-    this.setState({ isShow: true, largeFormat: largeFormat });
+  const onCloseModal = () => {
+    setIsShow(false);
   };
 
-  onCloseModal = () => {
-    this.setState({ isShow: false });
-  };
+  return (
+    <AppStyled>
+      <Searchbar onSubmitHandler={onSubmitHandler} />
+      {loading && <Loader />}
+      <ImageGallery imgArray={imgArray} onClick={onOpenModal} />
+      {isShow && <Modal onClose={onCloseModal} largeFormat={largeFormat} />}
+      {loadMore && <Button onClick={onClickButtonMore} />}
+    </AppStyled>
+  );
+};
 
-  render() {
-    const { loadMore, imgArray, loading, isShow, largeFormat } = this.state;
-
-    return (
-      <AppStyled>
-        <Searchbar onSubmitHandler={this.onSubmitHandler} />
-        {loading && <Loader />}
-        <ImageGallery imgArray={imgArray} onClick={this.onOpenModal} />
-        {isShow && (
-          <Modal onClose={this.onCloseModal} largeFormat={largeFormat} />
-        )}
-        {loadMore && <Button onClick={this.onClickButtonMore} />}
-      </AppStyled>
-    );
-  }
-}
 export default App;
